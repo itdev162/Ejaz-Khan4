@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using Application.Posts;
 using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
+using System.Linq;
+
 
 namespace API.Controllers
 {
@@ -89,5 +93,29 @@ namespace API.Controllers
 
       throw new Exception("Error updating post");
     }
+    /// <summary>
+    /// Delete api/post/[id]
+    /// <summary>
+    /// <param name= "id">Post id </param>
+    /// <returns> True, if succesful </returns>
+    [HttpDelete("{id}")]
+
+    Var post = context.Posts.Find(id);
+
+    if (PostsController == null)
+    {
+      throw new Execption("Could not find post");
+
+    }
+
+    context.Remove(post);
+
+    var success = context.SaveChanges()> 0;
+
+    if (success)
+    {
+      return true;
+    }
+    throw new Exception("Error Deleting Post");
   }
 }
