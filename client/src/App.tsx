@@ -1,9 +1,12 @@
 import axios from 'axios';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import PostList from './components/PostList/PostList';
 import Post from './components/Post/Post';
+import CreatePost from './components/Post/CreatePost';
+import EditPost from './components/Post/EditPost';
 import './App.css';
+import { timingSafeEqual } from 'crypto';
 
 class App extends React.Component {
   state = {
@@ -42,33 +45,72 @@ class App extends React.Component {
     });
   };
 
+  editPost = post =>{
+    this.setState({
+      post: post
+    });
+  };
+
+  onPostCreated = post =>{
+    const newPosts = [...this.state.posts, post];
+
+    this.setState({
+      posts: newPosts
+
+    });
+  };
+
+  onPostUpdated = post =>{
+    console.log('update post: ', post);
+    const newPosts = [...this.state.posts];
+    const index = newPosts.findIndex(p=> p.id === post.id);
+
+    newPosts[index] = post;
+
+    this.setState({
+      posts: newPosts
+    });
+
+  };
+
   render() {
     const { posts } = this.state;
 
-    return (
+    return(
       <Router>
         <div className="App">
           <header className="App-header">
             BlogBox
           </header>
+          <nav>
+            <Link to="/">Home</Link>
+            <Link to="/new-post">New Post</Link>
+          </nav>
           <main className="App-content">
-            <Routes>
+            <Switch>
               <Route exact path="/">
                 <PostList
-                posts={posts}
-                clickPost={this.viewPost} 
-                deletePost={this.deletePost}  />
+                  posts={posts} 
+                  clickPost={this.viewPost}
+                  deletePost={this.deletePost}
+                  editPost={this.editPost}
+                  />
               </Route>
               <Route path="/posts/:postId">
-                <Post post={posts} />
+                <Post post={post} />
               </Route>
-            </Routes>
+              <Route path="/new-post">
+                <CreatePost onPostCreated={this.onPostCreated} />
+              </Route>
+              <Route path="/edit-post/:postId">
+                <EditPost post={post} onPostUpdated={this.onPostUpdated} />
+              </Route>
+            </Switch>
           </main>
         </div>
       </Router>
     );
   }
 }
-
 
 export default App;
